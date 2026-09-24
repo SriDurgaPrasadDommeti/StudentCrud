@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         JAR_NAME = 'Student_management_system-0.0.1-SNAPSHOT.jar'
-        APP_DIR  = '/home/ec2-user/deploy'
     }
 
     stages {
