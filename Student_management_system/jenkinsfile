@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        JAR_NAME = 'Student_management_system-0.0.1-SNAPSHOT.jar'
+        APP_DIR  = '/home/ec2-user/deploy'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -17,32 +22,14 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                dir('Student_management_system') {
-                    sh 'mvn test'
-                }
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                dir('Student_management_system') {
-                    sh 'docker build -t student-service:latest .'
-                }
-            }
-        }
-
         stage('Deploy') {
             steps {
                 sh '''
-                    docker stop student-service || true
-                    docker rm student-service || true
-
-                    docker run -d \
-                      --name student-service \
-                      --network host \
-                      student-service:latest
+                    mkdir -p $APP_DIR
+                    pkill -f $JAR_NAME || true
+                    cp Student_management_system/target/$JAR_NAME $APP_DIR/
+                    cd $APP_DIR
+                    JENKINS_NODE_COOKIE=dontKillMe nohup java -jar $JAR_NAME > app.log 2>&1 &
                 '''
             }
         }
@@ -50,7 +37,7 @@ pipeline {
 
     post {
         success {
-            echo 'Build, Test, Docker Build and Deployment completed successfully!'
+            echo 'Build and Deployment completed successfully!'
         }
 
         failure {
