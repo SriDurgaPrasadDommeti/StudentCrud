@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('Student_management_system') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully!'
+        }
+
+        failure {
+            echo 'Build failed. Check the console output.'
+        }
+    }
+}
