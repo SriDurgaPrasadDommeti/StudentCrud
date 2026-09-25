@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StudentController {
 	private final StudentService studentService;
-	//create Student successfully
+	//create Student 
     @PostMapping("/create")
     public ResponseEntity<StudentResponseDTO> createStudent(@Valid @RequestBody StudentRequestDTO dto) {
         return new ResponseEntity<>(studentService.createStudent(dto), HttpStatus.CREATED);
