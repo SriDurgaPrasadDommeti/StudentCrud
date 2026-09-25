@@ -43,7 +43,7 @@ pipeline {
                       --name student-management-system \
                       --add-host=host.docker.internal:host-gateway \
                       -p 8081:8081 \
-                      -e DB_URL="jdbc:mysql://host.docker.internal:3306/newzen" \
+                      -e DB_URL="jdbc:mysql://host.docker.internal:3306/newzen?useSSL=false" \
                       -e DB_USERNAME="root" \
                       -e DB_PASSWORD="root" \
                       student-management-system:latest
