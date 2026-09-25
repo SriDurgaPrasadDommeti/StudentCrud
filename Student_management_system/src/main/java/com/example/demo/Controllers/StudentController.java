@@ -31,6 +31,11 @@ public class StudentController {
     public ResponseEntity<StudentResponseDTO> createStudent(@Valid @RequestBody StudentRequestDTO dto) {
         return new ResponseEntity<>(studentService.createStudent(dto), HttpStatus.CREATED);
     }
+    
+    @GetMapping("/test")
+    public ResponseEntity<String> testApi() {
+        return ResponseEntity.ok("Student Management System API is working successfully");
+    }
 
     @GetMapping("/getbyid/{id}")
     public ResponseEntity<StudentResponseDTO> getStudentById(@PathVariable Long id) {
