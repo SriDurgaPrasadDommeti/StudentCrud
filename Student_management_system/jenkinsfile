@@ -16,15 +16,64 @@ pipeline {
                 }
             }
         }
+
+        stage('Test') {
+            steps {
+                dir('Student_management_system') {
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('Student_management_system') {
+                    sh 'docker build -t student-management-system:latest .'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker stop student-management-system || true
+                    docker rm student-management-system || true
+
+                    docker run -d \
+                      --name student-management-system \
+                      --add-host=host.docker.internal:host-gateway \
+                      -p 8081:8081 \
+                      -e DB_URL="jdbc:mysql://host.docker.internal:3306/newzen" \
+                      -e DB_USERNAME="root" \
+                      -e DB_PASSWORD="root" \
+                      student-management-system:latest
+
+                    echo "Waiting for application to start..."
+                    sleep 15
+
+                    echo "Container status:"
+                    docker ps -a --filter "name=student-management-system"
+
+                    if [ "$(docker inspect -f '{{.State.Running}}' student-management-system)" != "true" ]; then
+                        echo "Container failed to start!"
+                        echo "Container logs:"
+                        docker logs student-management-system
+                        exit 1
+                    fi
+
+                    echo "Container is running successfully!"
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'Build completed successfully!'
+            echo 'Build, Test, Docker Build and Deployment completed successfully!'
         }
 
         failure {
-            echo 'Build failed. Check the console output.'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
